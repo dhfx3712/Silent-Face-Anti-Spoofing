@@ -35,7 +35,7 @@ class DatasetFolderFT(datasets.ImageFolder):
             print('FT image is None -->', path)
         assert sample is not None
 
-        ft_sample = cv2.resize(ft_sample, (self.ft_width, self.ft_height))
+        ft_sample = cv2.resize(ft_sample, (self.ft_width, self.ft_height)) #调整fft后的大小
         ft_sample = torch.from_numpy(ft_sample).float()
         ft_sample = torch.unsqueeze(ft_sample, 0)
 
@@ -52,14 +52,16 @@ class DatasetFolderFT(datasets.ImageFolder):
 def generate_FT(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     f = np.fft.fft2(image)
-    fshift = np.fft.fftshift(f)
-    fimg = np.log(np.abs(fshift)+1)
+    fshift = np.fft.fftshift(f) #对称操作
+    print (f'fshift : {np.shape(fshift)},{fshift[0:1]}') #复数形式
+
+    fimg = np.log(np.abs(fshift)+1) #处理0的情况
     maxx = -1
     minn = 100000
     for i in range(len(fimg)):
         if maxx < max(fimg[i]):
-            maxx = max(fimg[i])
+            maxx = max(fimg[i])#最大值
         if minn > min(fimg[i]):
-            minn = min(fimg[i])
-    fimg = (fimg - minn+1) / (maxx - minn+1)
+            minn = min(fimg[i])#最小值
+    fimg = (fimg - minn+1) / (maxx - minn+1) #归一化
     return fimg

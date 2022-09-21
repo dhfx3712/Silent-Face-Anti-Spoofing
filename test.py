@@ -35,14 +35,15 @@ def test(image_name, model_dir, device_id):
     model_test = AntiSpoofPredict(device_id)
     image_cropper = CropImage()
     image = cv2.imread(SAMPLE_IMAGE_PATH + image_name)
-    result = check_image(image)
+    # result = check_image(image)
+    result = image
     if result is False:
         return
     image_bbox = model_test.get_bbox(image)
     prediction = np.zeros((1, 3))
     test_speed = 0
     # sum the prediction from single model's result
-    for model_name in os.listdir(model_dir):
+    for model_name in os.listdir(model_dir): #遍历模型地址
         h_input, w_input, model_type, scale = parse_model_name(model_name)
         param = {
             "org_img": image,
@@ -57,11 +58,12 @@ def test(image_name, model_dir, device_id):
         img = image_cropper.crop(**param)
         start = time.time()
         prediction += model_test.predict(img, os.path.join(model_dir, model_name))
+        print (f'prediction : {prediction}')
         test_speed += time.time()-start
 
     # draw result of prediction
     label = np.argmax(prediction)
-    value = prediction[0][label]/2
+    value = prediction[0][label]/2 #2次预测，取平均值
     if label == 1:
         print("Image '{}' is Real Face. Score: {:.2f}.".format(image_name, value))
         result_text = "RealFace Score: {:.2f}".format(value)

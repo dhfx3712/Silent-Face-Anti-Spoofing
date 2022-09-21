@@ -1,1 +1,5 @@
 .idea
+!.gitignore
+*.pyc
+*.pth
+*/__pycache__

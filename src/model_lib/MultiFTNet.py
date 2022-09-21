@@ -12,7 +12,7 @@ from src.model_lib.MiniFASNet import MiniFASNetV1,MiniFASNetV2,MiniFASNetV1SE,Mi
 class FTGenerator(nn.Module):
     def __init__(self, in_channels=48, out_channels=1):
         super(FTGenerator, self).__init__()
-
+        #kernel_size=(3, 3), padding=1图大小不变化
         self.ft = nn.Sequential(
             nn.Conv2d(in_channels, 128, kernel_size=(3, 3), padding=1),
             nn.BatchNorm2d(128),
@@ -38,7 +38,7 @@ class MultiFTNet(nn.Module):
         self.num_classes = num_classes
         self.model = MiniFASNetV2SE(embedding_size=embedding_size, conv6_kernel=conv6_kernel,
                                       num_classes=num_classes, img_channel=img_channel)
-        self.FTGenerator = FTGenerator(in_channels=128)
+        self.FTGenerator = FTGenerator(in_channels=128) #self.conv_4输出128
         self._initialize_weights()
 
     def _initialize_weights(self):
@@ -62,6 +62,7 @@ class MultiFTNet(nn.Module):
         x = self.model.conv_3(x)
         x = self.model.conv_34(x)
         x = self.model.conv_4(x)
+        print (f'x_shape : {x.shape}')
         x1 = self.model.conv_45(x)
         x1 = self.model.conv_5(x1)
         x1 = self.model.conv_6_sep(x1)

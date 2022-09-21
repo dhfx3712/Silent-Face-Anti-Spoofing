@@ -172,13 +172,14 @@ class MiniFASNet(Module):
         c1 = [(keep[1], keep[2])]
         c2 = [(keep[2], keep[3])]
         c3 = [(keep[3], keep[4])]
-
+        #输入keep[1]，输出keep[4]
         self.conv_23 = Depth_Wise(c1[0], c2[0], c3[0], kernel=(3, 3), stride=(2, 2), padding=(1, 1), groups=keep[3])
 
         c1 = [(keep[4], keep[5]), (keep[7], keep[8]), (keep[10], keep[11]), (keep[13], keep[14])]
         c2 = [(keep[5], keep[6]), (keep[8], keep[9]), (keep[11], keep[12]), (keep[14], keep[15])]
         c3 = [(keep[6], keep[7]), (keep[9], keep[10]), (keep[12], keep[13]), (keep[15], keep[16])]
 
+        #num_block 对应c1的长度。第一轮输入keep[4]，输出keep[7]。第二轮输入keep[7]，输出keep[10]
         self.conv_3 = Residual(c1, c2, c3, num_block=4, groups=keep[4], kernel=(3, 3), stride=(1, 1), padding=(1, 1))
 
         c1 = [(keep[16], keep[17])]
@@ -222,6 +223,7 @@ class MiniFASNet(Module):
         out = self.conv_3(out)
         out = self.conv_34(out)
         out = self.conv_4(out)
+        print (f'out_shape :{out.shape}')
         out = self.conv_45(out)
         out = self.conv_5(out)
         out = self.conv_6_sep(out)
@@ -275,6 +277,7 @@ keep_dict = {'1.8M': [32, 32, 103, 103, 64, 13, 13, 64, 26, 26,
              }
 
 
+#输入尺寸通过keep_dict控制
 # (80x80) flops: 0.044, params: 0.41
 def MiniFASNetV1(embedding_size=128, conv6_kernel=(7, 7),
                      drop_p=0.2, num_classes=3, img_channel=3):

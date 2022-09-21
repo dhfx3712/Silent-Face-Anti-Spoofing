@@ -52,12 +52,12 @@ def update_config(args, conf):
     conf.devices = args.devices
     conf.patch_info = args.patch_info
     w_input, h_input = get_width_height(args.patch_info)
-    conf.input_size = [h_input, w_input]
+    conf.input_size = [h_input, w_input] #80*80 3次stride=(2, 2)，输出10*10
     conf.kernel_size = get_kernel(h_input, w_input)
     conf.device = "cuda:{}".format(conf.devices[0]) if torch.cuda.is_available() else "cpu"
 
     # resize fourier image size
-    conf.ft_height = 2*conf.kernel_size[0]
+    conf.ft_height = 2*conf.kernel_size[0] #2*5
     conf.ft_width = 2*conf.kernel_size[1]
     current_time = datetime.now().strftime('%b%d_%H-%M-%S')
     job_name = 'Anti_Spoofing_{}'.format(args.patch_info)
